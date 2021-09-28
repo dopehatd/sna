@@ -6,7 +6,7 @@ mkdir projects/Project1/Documents
 mkdir projects/Project1/Source
 mkdir projects/Project2
 mkdir projects/Project2/Documents
-mkdir projects/Projects2/Source
+mkdir projects/Project2/Source
 
 ######################################
 
