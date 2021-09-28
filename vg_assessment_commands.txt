@@ -1,0 +1,205 @@
+############################################################
+
+root@dmnx:~# pvcreate /dev/sdb
+  Physical volume "/dev/sdb" successfully created.
+
+
+############################################################
+
+root@dmnx:~# vgcreate vg_assessment /dev/sdb
+  Volume group "vg_assessment" successfully created
+
+#############################################################
+
+root@dmnx:~# vgdisplay
+  --- Volume group ---
+  VG Name               vg_assessment
+  System ID
+  Format                lvm2
+  Metadata Areas        1
+  Metadata Sequence No  1
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                0
+  Open LV               0
+  Max PV                0
+  Cur PV                1
+  Act PV                1
+  VG Size               <10.00 GiB
+  PE Size               4.00 MiB
+  Total PE              2559
+  Alloc PE / Size       0 / 0
+  Free  PE / Size       2559 / <10.00 GiB
+  VG UUID               SJW6HG-ehMC-oJ1C-Fq8Q-2GrC-xn0M-7BzFvD
+
+#########################################################################################
+
+root@dmnx:~# lvcreate -L 500M -n lv_assess1 vg_assessment
+  Logical volume "lv_assess1" created.
+
+#########################################################################################
+
+root@dmnx:~# lvdisplay
+  --- Logical volume ---
+  LV Path                /dev/vg_assessment/lv_assess1
+  LV Name                lv_assess1
+  VG Name                vg_assessment
+  LV UUID                368BUH-sdre-p5fp-nnrB-YZZS-CfdH-u2ycuR
+  LV Write Access        read/write
+  LV Creation host, time dmnx, 2021-09-28 13:00:03 +0300
+  LV Status              available
+  # open                 0
+  LV Size                500.00 MiB
+  Current LE             125
+  Segments               1
+  Allocation             inherit
+  Read ahead sectors     auto
+  - currently set to     256
+  Block device           254:0
+
+#############################################################################################
+
+root@dmnx:~# mkfs.ext4 /dev/vg_assessment/lv_assess1
+mke2fs 1.46.2 (28-Feb-2021)
+Creating filesystem with 512000 1k blocks and 128016 inodes
+Filesystem UUID: 1f99c4d8-568f-4240-abc7-4dc7c7fa2ad7
+Superblock backups stored on blocks:
+        8193, 24577, 40961, 57345, 73729, 204801, 221185, 401409
+
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+
+#################################################################################################
+
+
+root@dmnx:~# mkfs.ext4 /dev/vg_assessment/lv_assess1
+
+mke2fs 1.46.2 (28-Feb-2021)
+Creating filesystem with 512000 1k blocks and 128016 inodes
+Filesystem UUID: 1f99c4d8-568f-4240-abc7-4dc7c7fa2ad7
+Superblock backups stored on blocks:
+        8193, 24577, 40961, 57345, 73729, 204801, 221185, 401409
+
+Allocating group tables: done
+Writing inode tables: done
+Creating journal (8192 blocks): done
+Writing superblocks and filesystem accounting information: done
+
+root@dmnx:~# mount /dev/vg_assessment/lv_assess1 /data/lvm1/
+root@dmnx:~# df -h
+Filesystem                            Size  Used Avail Use% Mounted on
+
+/dev/mapper/vg_assessment-lv_assess1  474M   14K  445M   1% /data/lvm1
+
+#############################################################################################
+
+root@dmnx:~# lvextend -l +100%FREE /dev/vg_assessment/lv_assess1
+  
+Size of logical volume vg_assessment/lv_assess1 changed from 500.00 MiB (125 extents) to <10.00 GiB (2559 extents).
+  Logical volume vg_assessment/lv_assess1 successfully resized.
+
+###############################################################################################
+
+root@dmnx:~# resize2fs /dev/vg_assessment/lv_assess1
+resize2fs 1.46.2 (28-Feb-2021)
+Filesystem at /dev/vg_assessment/lv_assess1 is mounted on /data/lvm1; on-line resizing required
+old_desc_blocks = 4, new_desc_blocks = 80
+The filesystem on /dev/vg_assessment/lv_assess1 is now 10481664 (1k) blocks long.
+
+###################################################################################################
+
+root@dmnx:~# df -h
+Filesystem                            Size  Used Avail Use% Mounted on
+
+/dev/mapper/vg_assessment-lv_assess1  9.7G  2.7M  9.3G   1% /data/lvm1
+
+####################################################################################################
+
+root@dmnx:~# vgextend vg_assessment /dev/sdc
+  Physical volume "/dev/sdc" successfully created.
+  Volume group "vg_assessment" successfully extended
+
+####################################################################################################
+
+root@dmnx:~# vgdisplay
+  --- Volume group ---
+  VG Name               vg_assessment
+  System ID
+  Format                lvm2
+  Metadata Areas        2
+  Metadata Sequence No  4
+  VG Access             read/write
+  VG Status             resizable
+  MAX LV                0
+  Cur LV                1
+  Open LV               1
+  Max PV                0
+  Cur PV                2
+  Act PV                2
+  VG Size               19.99 GiB
+  PE Size               4.00 MiB
+  Total PE              5118
+  Alloc PE / Size       2559 / <10.00 GiB
+  Free  PE / Size       2559 / <10.00 GiB
+  VG UUID               SJW6HG-ehMC-oJ1C-Fq8Q-2GrC-xn0M-7BzFvD
+#########################################################################################################
+
+root@dmnx:~# lvcreate -L 500M -n lv_assess2 vg_assessment
+  Logical volume "lv_assess2" created.
+
+#########################################################################################################
+
+root@dmnx:~# mkfs.xfs /dev/vg_assessment/lv_assess2
+meta-data=/dev/vg_assessment/lv_assess2 isize=512    agcount=4, agsize=32000 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=0
+data     =                       bsize=4096   blocks=128000, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=1368, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+
+###########################################################################################################
+
+root@dmnx:~# mount /dev/vg_assessment/lv_assess2 /data/lvm2/
+root@dmnx:~# df -h
+Filesystem                            Size  Used Avail Use% Mounted on
+
+/dev/mapper/vg_assessment-lv_assess1  9.7G  2.7M  9.3G   1% /data/lvm1
+/dev/mapper/vg_assessment-lv_assess2  495M   29M  466M   6% /data/lvm2
+
+
+#############################################################################################################
+
+root@dmnx:~# lvextend -L 5G /dev/vg_assessment/lv_assess2
+  Size of logical volume vg_assessment/lv_assess2 changed from 500.00 MiB (125 extents) to 5.00 GiB (1280 extents).
+  Logical volume vg_assessment/lv_assess2 successfully resized.
+
+#################################################################################################################
+
+root@dmnx:~# xfs_growfs /dev/vg_assessment/lv_assess2
+meta-data=/dev/mapper/vg_assessment-lv_assess2 isize=512    agcount=4, agsize=32000 blks
+         =                       sectsz=512   attr=2, projid32bit=1
+         =                       crc=1        finobt=1, sparse=1, rmapbt=0
+         =                       reflink=1    bigtime=0
+data     =                       bsize=4096   blocks=128000, imaxpct=25
+         =                       sunit=0      swidth=0 blks
+naming   =version 2              bsize=4096   ascii-ci=0, ftype=1
+log      =internal log           bsize=4096   blocks=1368, version=2
+         =                       sectsz=512   sunit=0 blks, lazy-count=1
+realtime =none                   extsz=4096   blocks=0, rtextents=0
+data blocks changed from 128000 to 1310720
+
+####################################################################################################################
+
+dmnx:~# df -h
+Filesystem                            Size  Used Avail Use% Mounted on
+
+/dev/mapper/vg_assessment-lv_assess1  9.7G  2.7M  9.3G   1% /data/lvm1
+/dev/mapper/vg_assessment-lv_assess2  5.0G   63M  5.0G   2% /data/lvm2
